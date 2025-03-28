@@ -1,0 +1,66 @@
+﻿RDLC rport in .net8 c# windows project
+
+Direct no tools/options available from microsoft so i searched and tried lot of solutions.
+Finally thos worked for me.
+
+Add Packages from nudget packahe manageer
+
+ReportViewerCore.NETCore
+ReportViewerCore.WinForms
+(lkosson)
+https://github.com/lkosson/reportviewercore/
+
+Add Class
+
+ class Report
+    {
+        public static void Load(LocalReport report)
+        {
+            var items = new[] { new ReportItem { Description = "Widget 6000", Price = 104.99m, Qty = 1 }, new ReportItem { Description = "Gizmo MAX", Price = 1.41m, Qty = 25 } };
+            var parameters = new[] { new ReportParameter("Title", "Invoice 4/2020") };
+            using var fs = new FileStream("Report1.rdlc", FileMode.Open);
+            report.LoadReportDefinition(fs);
+            report.DataSources.Add(new ReportDataSource("DataSet1", items));
+            report.SetParameters(parameters);
+        }
+    }
+
+    add class
+
+     public class ReportItem
+    {
+        public string Description { get; set; }
+        public decimal Price { get; set; }
+        public int Qty { get; set; }
+        public decimal Total => Price * Qty;
+    }
+
+    Final code to call on report form
+
+     public partial class Form1 : Form
+    {
+        private readonly ReportViewer reportViewer;
+        public Form1()
+        {
+            InitializeComponent();
+
+            Text = "Report viewer";
+            WindowState = FormWindowState.Maximized;
+            reportViewer = new ReportViewer();
+            reportViewer.Dock = DockStyle.Fill;
+            this.Controls.Add(reportViewer);
+            Application.DoEvents();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            Report.Load(reportViewer.LocalReport);
+            reportViewer.RefreshReport();
+            //base.OnLoad(e);
+        }
+    }
+
+    Thats all
+
+
+
